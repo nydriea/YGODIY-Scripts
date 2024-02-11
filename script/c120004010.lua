@@ -1,7 +1,6 @@
 --时络之阿格里埃娜
 local m=120004010
 local cm=_G["c"..m]
-Duel.LoadScript("AnkoRequire.lua")
 function cm.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 
@@ -12,6 +11,7 @@ function cm.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
     e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1,m)
 	e1:SetTarget(cm.e1tg)
 	e1:SetOperation(cm.e1op)
@@ -45,7 +45,7 @@ end
 
 --#region e1
 function cm.e1filter(c)
-	return not c:IsCode(m) and c:IsRace(RACE_CYBERSE) and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()
+	return not c:IsCode(m) and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE) and c:IsAbleToHand()
 end
 function cm.e1tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.e1filter,tp,LOCATION_DECK,0,1,nil) end
@@ -86,7 +86,7 @@ end
 
 --#region e3
 function cm.e3filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_CYBERSE) and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE) and c:IsAbleToHand()
 end
 function cm.e3tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.e3filter,tp,LOCATION_EXTRA,0,1,nil) end

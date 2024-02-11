@@ -1,9 +1,8 @@
 --虚魅魔灵 「用户界面」盖提娅
 local m=120004020
 local cm=_G["c"..m]
-Duel.LoadScript("AnkoRequire.lua")
 function cm.initial_effect(c)
-	aux.AddLinkProcedure(c,cm.materialfilter,2)
+	aux.AddLinkProcedure(c,cm.linkMaterialFilter,2)
 	c:EnableReviveLimit()
 	aux.EnablePendulumAttribute(c,false)
 
@@ -45,24 +44,24 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 
---#region link material
-function cm.materialfilter(c)
-	return c:IsLinkRace(RACE_CYBERSE) and c:IsType(TYPE_PENDULUM)
+--#region linkMaterial
+function cm.linkMaterialFilter(c)
+	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE)
+	
 end
---#endregion
+--#endregion linkMaterial
 
 --#region e1
 function cm.e1filter(c)
-	return c:IsRace(RACE_CYBERSE) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
+	return c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE) and not c:IsForbidden()
 end
 function cm.e1tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		and Duel.IsExistingMatchingCard(cm.e1filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(cm.e1filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function cm.e1op(e,tp,eg,ep,ev,re,r,rp)
     local tc=e:GetHandler()
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
 	if Duel.SendtoDeck(tc, nil, SEQ_DECKSHUFFLE, REASON_EFFECT) then
+		if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return end
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
         local g=Duel.SelectMatchingCard(tp,cm.e1filter,tp,LOCATION_DECK,0,1,1,nil)
         if g:GetCount()>0 then
@@ -87,7 +86,7 @@ function cm.e2tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		local chkf=tp
-		local mg1=Duel.GetFusionMaterial(tp):Filter(Card.IsOnField,nil)
+		local mg1=Duel.GetFusionMaterial(tp):Filter(cm.e2materialFilter,nil,e)
 		mg1:Merge(Duel.GetMatchingGroup(cm.e2materialFilter,tp,LOCATION_PZONE,0,nil,e))
 		local res=Duel.IsExistingMatchingCard(cm.e2fmonsterFilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,c,chkf)
 		if not res then
@@ -107,7 +106,7 @@ function cm.e2op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local chkf=tp
 	if not c:IsRelateToEffect(e) or c:IsImmuneToEffect(e) then return end
-	local mg1=Duel.GetFusionMaterial(tp):Filter(cm.e2pzoneMaterialFilter,nil,e)
+	local mg1=Duel.GetFusionMaterial(tp):Filter(cm.e2materialFilter,nil,e)
 	mg1:Merge(Duel.GetMatchingGroup(cm.e2materialFilter,tp,LOCATION_PZONE,0,nil,e))
 	local sg1=Duel.GetMatchingGroup(cm.e2fmonsterFilter,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,c,chkf)
 	local mg2=nil
@@ -126,13 +125,13 @@ function cm.e2op(e,tp,eg,ep,ev,re,r,rp)
 		local tg=sg:Select(tp,1,1,nil)
 		local tc=tg:GetFirst()
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
-			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,c,chkf)
+			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
 			tc:SetMaterial(mat1)
 			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 			Duel.BreakEffect()
 			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		else
-			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,c,chkf)
+			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
 			local fop=ce:GetOperation()
 			fop(ce,e,tp,tc,mat2)
 		end
@@ -151,10 +150,12 @@ function cm.e3tg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cm.e3op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return (c:IsFaceup() and c:IsLocation(LOCATION_EXTRA)) and r==REASON_FUSION
+	if c:IsRelateToEffect(e) then
+		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+	end
 end
 function cm.e4con(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
+	return (c:IsFaceup() and c:IsLocation(LOCATION_EXTRA)) and r==REASON_FUSION
 end
 --#endregion e3+e4

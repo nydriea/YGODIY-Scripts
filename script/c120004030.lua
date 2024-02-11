@@ -1,7 +1,6 @@
 --虚魅魔灵 「模块整合」桀派
 local m=120004030
 local cm=_G["c"..m]
-Duel.LoadScript("AnkoRequire.lua")
 function cm.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	
@@ -96,8 +95,7 @@ end
 
 --#region e2+e3
 function cm.e2exFilter(c)
-    return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE)
-        and c:IsAbleToHand()
+    return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsRace(RACE_CYBERSE) and c:IsAbleToHand()
 end
 function cm.e2graveFilter(c)
     return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0xf91) and c:IsAbleToHand()
@@ -105,7 +103,7 @@ end
 function cm.e2tg(e,tp,eg,ep,ev,re,r,rp,chk)
     local g1=Duel.IsExistingMatchingCard(cm.e2exFilter,tp,LOCATION_EXTRA,0,1,nil)
     local g2=Duel.IsExistingMatchingCard(cm.e2graveFilter,tp,LOCATION_GRAVE,0,1,nil)
-	if chk==0 then return g1:GetCount()>0 or g2:GetCount()>0 end
+	if chk==0 then return g1 or g2 end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA+LOCATION_GRAVE)
 end
 function cm.e2op(e,tp,eg,ep,ev,re,r,rp)
