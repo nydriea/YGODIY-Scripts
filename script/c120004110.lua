@@ -36,7 +36,6 @@ function cm.initial_effect(c)
 	e2redirect:SetValue(cm.e2redirectVal)
 	c:RegisterEffect(e2redirect,true)
 
-
     --②：这张卡灵摆召唤成功的场合，以场上1张卡为对象才能发动。那张卡破坏。
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
