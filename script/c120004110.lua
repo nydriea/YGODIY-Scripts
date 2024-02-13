@@ -26,8 +26,16 @@ function cm.initial_effect(c)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCountLimit(1,m+1)
 	e2:SetValue(cm.e2matval)
-    e2:SetOperation(cm.e2op)
 	c:RegisterEffect(e2)
+	local e2redirect=Effect.CreateEffect(c)
+	e2redirect:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2redirect:SetCode(EFFECT_SEND_REPLACE)
+	e2redirect:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2redirect:SetCondition(cm.e2redirectCon)
+	e2redirect:SetTarget(cm.e2redirectTg)
+	e2redirect:SetValue(cm.e2redirectVal)
+	c:RegisterEffect(e2redirect,true)
+
 
     --②：这张卡灵摆召唤成功的场合，以场上1张卡为对象才能发动。那张卡破坏。
 	local e3=Effect.CreateEffect(c)
@@ -80,17 +88,18 @@ end
 function cm.e2matval(e,lc,mg,c,tp)
 	if not lc:IsSetCard(0xf91) then return false,nil end
     local res=not mg or mg:IsExists(cm.e2MFilter,1,nil) and not mg:IsExists(cm.e2ExMFilter,1,nil)
-    if res then
-        local tc=e:GetHandler()
-        local e1=Effect.CreateEffect(c)
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetCode(EFFECT_TO_GRAVE_REDIRECT)
-        e1:SetRange(LOCATION_HAND)
-        e1:SetValue(LOCATION_EXTRA)
-        e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
-        tc:RegisterEffect(e1)
-    end
 	return true,res
+end
+function cm.e2redirectCon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsLocation(LOCATION_HAND) and bit.band(c:GetReason(),REASON_MATERIAL+REASON_LINK)==REASON_MATERIAL+REASON_LINK
+end
+function cm.e2redirectTg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return e:GetHandler():IsAbleToExtra() end
+	Duel.SendtoExtraP(e:GetHandler(),nil,REASON_EFFECT)
+end
+function cm.e2redirectVal(e,c)
+	return false
 end
 --#endregion e2
 
