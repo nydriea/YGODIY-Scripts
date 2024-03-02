@@ -68,7 +68,7 @@ end
 function cm.e3op(e,tp,eg,ep,ev,re,r,rp)
     local g=Duel.GetMatchingGroup(cm.e3filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
     if g:GetCount()>0 then
-        Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(m,1))
+        Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(e:GetHandler():GetCode(),1))
         local sg=g:SelectSubGroup(tp,aux.TRUE,false,1,5)
         Duel.SendtoExtraP(sg,nil,REASON_EFFECT)
         Duel.BreakEffect()

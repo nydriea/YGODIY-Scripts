@@ -5,7 +5,7 @@ function cm.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.EnablePendulumAttribute(c,false)
     --「虚魅魔灵」融合怪兽＋灵摆怪兽
-	aux.AddFusionProcFun2(cm.fmFilter,aux.FilterBoolFunction(Card.IsFusionType,TYPE_PENDULUM),true)
+	aux.AddFusionProcFun2(c,cm.fmFilter,aux.FilterBoolFunction(Card.IsFusionType,TYPE_PENDULUM),true)
 	
     --这个卡名的灵摆效果1回合只能使用1次。
     --①：另一边的自己的灵摆区域有「虚魅魔灵」卡或「阿格里埃娜」卡存在的场合才能发动。
