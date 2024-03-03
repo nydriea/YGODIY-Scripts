@@ -13,18 +13,19 @@ function cm.initial_effect(c)
 	e1:SetCondition(cm.e1con)
 	e1:SetValue(4)
 	c:RegisterEffect(e1)
+	local e2left=e1:Clone()
+	e2left:SetCode(EFFECT_CHANGE_RSCALE)
+	c:RegisterEffect(e2left)
 
     --这个卡名的怪兽效果1回合只能使用1次。
     --①：这张卡被战斗·效果破坏的场合才能发动。
     --下次的准备阶段，从自己的额外卡组把「虚魅魔灵 「形象设计」罗诺维」以外的1只表侧表示的电子界族怪兽加入手卡。
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_DESTROYED)
-	e2:SetRange(LOCATION_MZONE)
     e2:SetCountLimit(1,m)
 	e2:SetCondition(cm.e2con)
-	e2:SetTarget(cm.e2tg)
 	e2:SetOperation(cm.e2op)
 	c:RegisterEffect(e2)
 end
@@ -41,10 +42,6 @@ end
 --#region e2
 function cm.e2con(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT+REASON_BATTLE)~=0
-end
-function cm.e2tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,0)
 end
 function cm.e2op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

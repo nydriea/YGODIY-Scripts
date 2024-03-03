@@ -46,12 +46,26 @@ function cm.e1op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(tp,3)
 	local g=Duel.GetDecktopGroup(tp,3)
     local ct=g:GetCount()
-	if ct()>0 and g:IsExists(cm.e1filter,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(m,2)) then
+	if ct>0 and g:IsExists(cm.e1filter,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(m,2)) then
         Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
         local sg=g:FilterSelect(tp,cm.e1filter,1,1,nil)
         Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		local lscale=sg:GetFirst():GetLeftScale()
+		local rscale=sg:GetFirst():GetRightScale()
         Duel.ConfirmCards(1-tp,sg)
         Duel.ShuffleHand(tp)
+		ct=ct-1
+		local c=e:GetHandler()
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_LSCALE)
+		e1:SetValue(lscale)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_CHANGE_RSCALE)
+		e2:SetValue(rscale)
+		c:RegisterEffect(e2)
 	end
 	if ct>0 then
 		Duel.SortDecktop(tp,tp,ct)

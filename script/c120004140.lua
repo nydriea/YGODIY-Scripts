@@ -23,7 +23,6 @@ function cm.initial_effect(c)
     --这个卡名的①的怪兽效果1回合只能使用1次。
     --①：自己·对方回合可以发动。得到对方场上1只怪兽的控制权。对方不能应对这个效果把怪兽的效果发动。
     local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
@@ -77,12 +76,12 @@ end
 --#endregion e1
 
 --#region e2
-function cm.e2filter(c,e,tp)
+function cm.e2filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToChangeControler()
 end
 function cm.e2ptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToChangeControler() end
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(cm.e2filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,0,0)
     Duel.SetChainLimit(cm.e2chlimit)
 end
